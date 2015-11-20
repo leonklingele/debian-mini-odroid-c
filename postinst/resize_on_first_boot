@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+set -e
+
+# Setup resize for first boot
+mv /root/resize2fs_first /etc/init.d/resize2fs_first &&
+chmod +x /etc/init.d/resize2fs_first &&
+mv /root/resize2fs_last /etc/init.d/resize2fs_last &&
+update-rc.d resize2fs_first defaults
