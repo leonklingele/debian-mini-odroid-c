@@ -18,16 +18,16 @@ ROOTFS_DIR := rootfs
 RAMDISK_FILE := uInitrd
 IMAGE_FILE := sdcard-$(DIST).img
 
-UBOOT_TOOLCHAIN := gcc-linaro-arm-none-eabi-4.9-2014.09_linux.tar.xz
-UBOOT_TOOLCHAIN_URL := https://releases.linaro.org/14.09/components/toolchain/binaries/$(UBOOT_TOOLCHAIN)
+UBOOT_TOOLCHAIN := gcc-linaro-4.9-2014.11-x86_64_aarch64-elf.tar.xz
+UBOOT_TOOLCHAIN_URL := https://releases.linaro.org/14.11/components/toolchain/binaries/aarch64-none-elf/$(UBOOT_TOOLCHAIN)
 UBOOT_TC_DIR := uboot_tc
-UBOOT_TC_PATH := $(UBOOT_TC_DIR)/gcc-linaro-arm-none-eabi-4.8-2014.04_linux/bin
+UBOOT_TC_PATH := $(UBOOT_TC_DIR)/gcc-linaro-4.9-2014.11-x86_64_aarch64-elf/bin
 UBOOT_REPO := https://github.com/hardkernel/u-boot.git
 UBOOT_BRANCH := odroidc-v2011.03
 UBOOT_SRC := u-boot
 
-LINUX_TOOLCHAIN := gcc-linaro-arm-linux-gnueabihf-4.9-2014.09_linux.tar.xz
-LINUX_TOOLCHAIN_URL := https://releases.linaro.org/14.09/components/toolchain/binaries/$(LINUX_TOOLCHAIN)
+LINUX_TOOLCHAIN := gcc-linaro-4.9-2014.11-x86_64_aarch64-linux-gnu.tar.xz
+LINUX_TOOLCHAIN_URL := http://releases.linaro.org/14.11/components/toolchain/binaries/aarch64-linux-gnu/$(LINUX_TOOLCHAIN)
 LINUX_TC_DIR := linux_tc
 LINUX_TC_PATH := $(LINUX_TC_DIR)/bin
 LINUX_TC_PREFIX := arm-linux-gnueabihf-
