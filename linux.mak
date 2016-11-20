@@ -20,7 +20,7 @@ distclean:
 
 $(LINUX_TC_DIR): $(LINUX_TOOLCHAIN)
 	mkdir -p $@
-	tar xf $(LINUX_TOOLCHAIN) --strip-components=1 -C $@
+	tar --no-same-owner -xf $(LINUX_TOOLCHAIN) --strip-components=1 -C $@
 
 $(LINUX_TOOLCHAIN):
 	wget -O $@ $(LINUX_TOOLCHAIN_URL)
