@@ -6,8 +6,8 @@
 
 set -e
 
-if [ "$#" -ne 5 ]; then
-	echo "Usage: $0 DIST DIST_URL KERNEL_VERSION ODROID ROOT_RW"
+if [ "$#" -ne 6 ]; then
+	echo "Usage: $0 DIST DIST_URL KERNEL_VERSION ODROID ROOT_RW SSH_PUBLIC_KEY"
 	exit 1
 fi
 
@@ -16,6 +16,7 @@ DIST_URL=$2
 KERNEL_VERSION=$3
 ODROID=$4
 ROOT_RW=$5
+SSH_PUBLIC_KEY="$6"
 
 echo "Running postinstall script..."
 
@@ -63,12 +64,12 @@ chmod +x /usr/sbin/policy-rc.d
 
 # Run custom install scripts
 if [ -d /postinst ]; then
-	find /postinst -maxdepth 1 -type f -executable -not -name "*~" -exec {} "$DIST" "$ODROID" "$ROOT_RW" \;
+	find /postinst -maxdepth 1 -type f -executable -not -name "*~" -exec {} "$DIST" "$ODROID" "$ROOT_RW" "$SSH_PUBLIC_KEY" \;
 fi
 
 # Run custom install scripts for a specific distribution
 if [ -d /postinst/$DIST ]; then
-	find /postinst/$DIST -maxdepth 1 -type f -executable -not -name "*~" -exec {} "$DIST" "$ODROID" "$ROOT_RW" \;
+	find /postinst/$DIST -maxdepth 1 -type f -executable -not -name "*~" -exec {} "$DIST" "$ODROID" "$ROOT_RW" "$SSH_PUBLIC_KEY" \;
 fi
 
 # Re-enable services to start

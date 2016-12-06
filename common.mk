@@ -5,6 +5,15 @@ IMAGE_MB ?= 2048
 BOOT_MB ?= 128
 ROOT_MB=$(shell expr $(IMAGE_MB) - $(BOOT_MB))
 
+ifneq ($(SSH_PUBLIC_KEY_FILE),)
+    SSH_PUBLIC_KEY=$(shell cat "$(SSH_PUBLIC_KEY_FILE)")
+    ifeq ($(SSH_PUBLIC_KEY),)
+        $(error SSH Public Key $(SSH_PUBLIC_KEY_FILE) not found)
+    endif
+else
+    $(warning Not using a SSH Public Key)
+endif
+
 ifeq ($(findstring $(ODROID),c1 c2),)
     $(error No ODROID specified! Supported targets: c1, c2)
 endif

@@ -46,7 +46,7 @@ $(ROOTFS_DIR): $(ROOTFS_DIR).base
 	mount -o bind /dev $@/dev
 	cp postinstall $@
 	if [ -d "postinst" ]; then cp -r postinst $@ ; fi
-	LINUX_VERSION="$(shell cat $(LINUX_SRC)/include/config/kernel.release)" && chroot $@ /bin/bash -c "/postinstall $(DIST) $(DIST_URL) $$LINUX_VERSION $(ODROID) $(ROOT_RW_FLAG)"
+	LINUX_VERSION="$(shell cat $(LINUX_SRC)/include/config/kernel.release)" && chroot $@ /bin/bash -c "/postinstall $(DIST) $(DIST_URL) $$LINUX_VERSION $(ODROID) $(ROOT_RW_FLAG) '$(SSH_PUBLIC_KEY)'"
 	if ls patches/*.patch 1> /dev/null 2>&1; then for i in patches/*.patch ; do patch -p0 -d $@ < $$i ; done fi
 	if [ -d patches/$(DIST) ]; then if ls patches/$(DIST)/*.patch 1> /dev/null 2>&1; then for i in patches/$(DIST)/*.patch; do patch -p0 -d $@ < $$i ; done fi fi
 	umount $@/proc

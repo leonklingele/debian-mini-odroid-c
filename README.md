@@ -29,7 +29,7 @@ sudo apt-get install libc6:i386 libncurses5:i386 libstdc++6:i386 lib32z1
 ## Build the image:
 Just use the make utility to build e.g. an sdcard-c2-jessie.img.  Be sure to run this with sudo, as root privileges are required to mount the image.
 ```
-sudo make ODROID=c2 DIST=jessie ROOT_RW=no IMAGE_MB=2024
+sudo make ODROID=c2 DIST=jessie ROOT_RW=no IMAGE_MB=2024 SSH_PUBLIC_KEY_FILE="$HOME/.ssh/id_rsa.pub"
 ```
 
 This will install the toolchains, compile u-boot, the kernel, bootstrap Debian and create a 1024mb sdcard-c1-jessie.img file, which then can be transferred to a sd card (e.g. using dd):

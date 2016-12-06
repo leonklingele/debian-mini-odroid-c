@@ -2,8 +2,11 @@
 # The first argument is the name of the distribution
 # The second argument is the name of the odroid device, e.g. "c1" or "c2"
 # The third argument is whether the rootfs is mounted read-only: "rw" or "ro"
+# The fourth argument is the SSH Public Key
 
 set -e
+
+ssh_public_key="$4"
 
 cat > /etc/ssh/sshd_config <<'EOF'
 Port 22
@@ -61,3 +64,6 @@ Ciphers chacha20-poly1305@openssh.com,aes256-gcm@openssh.com
 MACs hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com
 #,umac-128-etm@openssh.com,hmac-sha2-512,hmac-sha2-256,umac-128@openssh.com
 EOF
+
+mkdir -p "/root/.ssh"
+echo "$ssh_public_key" > "/root/.ssh/authorized_keys"
