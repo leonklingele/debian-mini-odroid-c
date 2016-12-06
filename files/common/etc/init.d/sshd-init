@@ -28,7 +28,9 @@ case "$1" in
           if [ "$RO_ROOT" != "0" ]; then
               mount -n -o remount,rw / || echo "Remounting / rw failed"
           fi
-          dpkg-reconfigure -f noninteractive openssh-server
+          #dpkg-reconfigure -f noninteractive openssh-server
+          ssh-keygen -f /etc/ssh/ssh_host_rsa_key -t rsa -b 4096 -N '' -q
+          ssh-keygen -f /etc/ssh/ssh_host_ed25519_key -t ed25519 -N '' -q
           if [ "$RO_ROOT" != "0" ]; then
               sync || echo "sync failed"
               mount -n -o remount,ro / || echo "Remount / ro failed"
