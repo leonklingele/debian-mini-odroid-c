@@ -1,0 +1,56 @@
+#!/bin/sh
+set -e
+
+PREREQ=""
+prereqs() {
+    echo "$PREREQ"
+}
+
+case "$1" in
+prereqs)
+    prereqs
+    exit 0
+    ;;
+esac
+
+. /scripts/functions
+
+# In case the clock is before the file system creation time (i.e.
+# image creation time), we forward the current time to that date.
+
+ROOTDEV=""
+
+for x in $(cat /proc/cmdline); do
+	case ${x} in
+	root=*)
+		value=${x#*=}
+		# Find the device node path depending on the form of root= :
+		case ${value} in
+		UUID=*)
+			ROOTDEV=/dev/disk/by-uuid/${value#UUID=}
+			;;
+		LABEL=*)
+			ROOTDEV=/dev/disk/by-label/${value#LABEL=}
+			;;
+		*)
+			ROOTDEV=${value}
+			;;
+		esac
+	;;
+	esac
+done
+
+ROOTDISK=$(readlink -f "$ROOTDEV")
+CREATEDATE=$(dumpe2fs -h "$ROOTDISK" 2> /dev/null | grep "Filesystem created")
+CREATEDATE=${CREATEDATE#*:}
+CREATEDATE_UNIX=$(date --utc --date "$CREATEDATE" +%s)
+CURDATE=$(date)
+CURDATE_UNIX=$(date --utc --date "$CURDATE" +%s)
+
+if [ "$CREATEDATE_UNIX" -gt "$CURDATE_UNIX" ]; then
+	NEWDATE="$CREATEDATE"
+	echo "initrd: fixing date from '$CURDATE' to '$NEWDATE'" > /dev/kmsg || true
+	date --set="$NEWDATE" > /dev/null 2>&1
+fi
+
+exit 0
