@@ -47,6 +47,7 @@ echo "deb-src http://ftp.debian.org/debian/ $DIST-backports main" >> /etc/apt/so
 
 # Update apt
 apt-get -y update
+apt-get -y dist-upgrade
 
 # Generate the initial ramfs
 update-initramfs -c -t -k $KERNEL_VERSION
