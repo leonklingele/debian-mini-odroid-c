@@ -1,12 +1,12 @@
-debian-mini-ro-root-odroid-c
-============================
+Debian for ODROID
+=================
 
 Script to build a minimal Debian sd card image.
 
 ## Features:
 * Supports ODROID-C1 and ODROID-C2
 * Supports building Wheezy (ODROID-C1 only) or Jessie (default) images (specify using the DIST variable)
-* SSH root login password: odroid
+* SSH root login via PubKey
 * Host name: odroidc-MACADDRESS (e.g. odroidc-1a2b3c4d5e6f)
 * If built with ROOT_RW=no the image will have a read-only root file system: /tmp, /root, /var/log, /media are tmpfs file systems and are writable, but won't persist
 * SSH host keys are generated and saved permanently on first boot
