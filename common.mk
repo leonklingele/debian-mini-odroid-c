@@ -8,7 +8,8 @@ ROOT_MB=$(shell expr $(IMAGE_MB) - $(BOOT_MB))
 ifneq ($(SSH_PUBLIC_KEY_FILE),)
     SSH_PUBLIC_KEY=$(shell cat "$(SSH_PUBLIC_KEY_FILE)")
     ifeq ($(SSH_PUBLIC_KEY),)
-        $(error SSH Public Key $(SSH_PUBLIC_KEY_FILE) not found)
+        $(warning SSH Public Key $(SSH_PUBLIC_KEY_FILE) not found, using RAW value)
+        SSH_PUBLIC_KEY=$(SSH_PUBLIC_KEY_FILE)
     endif
 else
     $(warning Not using a SSH Public Key)

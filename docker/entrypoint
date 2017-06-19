@@ -5,6 +5,7 @@ set -eu # fo pipefail
 ODROID="$1"
 DIST="$2"
 ROOT_RW="$3"
+SSH_PUBLIC_KEY="$4"
 
-sudo make ODROID="$ODROID" DIST="$DIST" ROOT_RW="$ROOT_RW" IMAGE_MB=2048
+sudo make ODROID="$ODROID" DIST="$DIST" ROOT_RW="$ROOT_RW" IMAGE_MB=2048 SSH_PUBLIC_KEY_FILE="$SSH_PUBLIC_KEY"
 mv *.img /done

@@ -47,7 +47,7 @@ sudo dd bs=1M if=sdcard-c2-stretch.img of=/dev/YOUR_SD_CARD && sync
 docker build -t build-debian-odroid-image .
 
 # Then build the image
-./docker/build "c2" "stretch" "yes"
+./docker/build "c2" "stretch" "yes" "$(cat "$HOME/.ssh/id_rsa.pub")"
 ```
 
 ## Customize your image:
