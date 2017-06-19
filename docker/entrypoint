@@ -1,0 +1,10 @@
+#!/bin/sh
+
+set -eu # fo pipefail
+
+ODROID="$1"
+DIST="$2"
+ROOT_RW="$3"
+
+sudo make ODROID="$ODROID" DIST="$DIST" ROOT_RW="$ROOT_RW" IMAGE_MB=2024
+mv *.img /done

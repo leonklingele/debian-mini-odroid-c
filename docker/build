@@ -1,0 +1,11 @@
+#!/bin/sh
+
+docker run \
+	--rm \
+	--cap-add=ALL \
+	--privileged=true \
+	-t \
+	-i \
+	-v="$(pwd)":/done \
+	build-debian-odroid-image \
+	"$@"

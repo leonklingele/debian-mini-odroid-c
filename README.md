@@ -13,6 +13,10 @@ Script to build a minimal Debian sd card image.
 * Automatic mounting of USB storage devices using usbmount
 
 ## Prerequisites:
+Docker
+
+or
+
 On a x86 based Ubuntu system, make sure the following packages are installed:
 ```
 sudo apt-get install sudo build-essential wget git lzop u-boot-tools binfmt-support \
@@ -26,7 +30,7 @@ sudo apt-get update
 sudo apt-get install libc6:i386 libncurses5:i386 libstdc++6:i386 lib32z1
 ```
 
-## Build the image:
+## Build the image (without Docker):
 Just use the make utility to build e.g. an sdcard-c2-stretch.img.  Be sure to run this with sudo, as root privileges are required to mount the image.
 ```
 sudo make ODROID=c2 DIST=stretch ROOT_RW=no IMAGE_MB=2024 SSH_PUBLIC_KEY_FILE="$HOME/.ssh/id_rsa.pub"
@@ -35,6 +39,15 @@ sudo make ODROID=c2 DIST=stretch ROOT_RW=no IMAGE_MB=2024 SSH_PUBLIC_KEY_FILE="$
 This will install the toolchains, compile u-boot, the kernel, bootstrap Debian and create a 1024mb sdcard-c1-stretch.img file, which then can be transferred to a sd card (e.g. using dd):
 ```
 sudo dd bs=1M if=sdcard-c2-stretch.img of=/dev/YOUR_SD_CARD && sync
+```
+
+## Build the image (with Docker):
+```
+# First build the Docker image
+docker build -t build-debian-odroid-image .
+
+# Then build the image
+./docker/build "c2" "stretch" "no"
 ```
 
 ## Customize your image:
