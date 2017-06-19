@@ -26,8 +26,10 @@ build: $(IMAGE_FILE)
 $(ROOTFS_DIR).base:
 	if test -d "$@.tmp"; then rm -rf "$@.tmp" ; fi
 	mkdir -p $@.tmp
-	debootstrap --foreign --include=ca-certificates,sudo,parted,rng-tools,ssh,vim,locales,ntpdate,usbmount,initramfs-tools --arch=$(DIST_ARCH) $(DIST) $@.tmp $(DIST_URL)
+	debootstrap --foreign --include=ca-certificates,sudo,parted,rng-tools,ssh,vim,locales,ntpdate,initramfs-tools,insserv --arch=$(DIST_ARCH) $(DIST) $@.tmp $(DIST_URL)
 	cp `which $(QEMU_STATIC_BIN)` $@.tmp/usr/bin
+	update-binfmts --enable qemu-arm # C1
+	update-binfmts --enable qemu-aarch64 # C2
 	chroot $@.tmp /bin/bash -c "/debootstrap/debootstrap --second-stage"
 	rm $@.tmp/etc/hostname
 	rm $@.tmp/etc/ssh/ssh_host_*

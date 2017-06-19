@@ -5,7 +5,7 @@ Script to build a minimal Debian sd card image.
 
 ## Features:
 * Supports ODROID-C1 and ODROID-C2
-* Supports building Wheezy (ODROID-C1 only) or Jessie (default) images (specify using the DIST variable)
+* Supports building Wheezy (ODROID-C1 only), Jessie or Stretch (default) images (specify using the DIST variable)
 * SSH root login via PubKey
 * Host name: odroidc-MACADDRESS (e.g. odroidc-1a2b3c4d5e6f)
 * If built with ROOT_RW=no the image will have a read-only root file system: /tmp, /root, /var/log, /media are tmpfs file systems and are writable, but won't persist
@@ -15,8 +15,8 @@ Script to build a minimal Debian sd card image.
 ## Prerequisites:
 On a x86 based Ubuntu system, make sure the following packages are installed:
 ```
-sudo apt-get install build-essential wget git lzop u-boot-tools binfmt-support \
-                     qemu qemu-user-static debootstrap parted
+sudo apt-get install sudo build-essential wget git lzop u-boot-tools binfmt-support \
+                     qemu qemu-user-static debootstrap parted bc udev dosfstool
 ```
 
 If you are running 64 bit Ubuntu, you might need to run the following commands to be able to launch the 32 bit toolchain:
@@ -27,14 +27,14 @@ sudo apt-get install libc6:i386 libncurses5:i386 libstdc++6:i386 lib32z1
 ```
 
 ## Build the image:
-Just use the make utility to build e.g. an sdcard-c2-jessie.img.  Be sure to run this with sudo, as root privileges are required to mount the image.
+Just use the make utility to build e.g. an sdcard-c2-stretch.img.  Be sure to run this with sudo, as root privileges are required to mount the image.
 ```
-sudo make ODROID=c2 DIST=jessie ROOT_RW=no IMAGE_MB=2024 SSH_PUBLIC_KEY_FILE="$HOME/.ssh/id_rsa.pub"
+sudo make ODROID=c2 DIST=stretch ROOT_RW=no IMAGE_MB=2024 SSH_PUBLIC_KEY_FILE="$HOME/.ssh/id_rsa.pub"
 ```
 
-This will install the toolchains, compile u-boot, the kernel, bootstrap Debian and create a 1024mb sdcard-c1-jessie.img file, which then can be transferred to a sd card (e.g. using dd):
+This will install the toolchains, compile u-boot, the kernel, bootstrap Debian and create a 1024mb sdcard-c1-stretch.img file, which then can be transferred to a sd card (e.g. using dd):
 ```
-sudo dd bs=1M if=sdcard-c2-jessie.img of=/dev/YOUR_SD_CARD && sync
+sudo dd bs=1M if=sdcard-c2-stretch.img of=/dev/YOUR_SD_CARD && sync
 ```
 
 ## Customize your image:

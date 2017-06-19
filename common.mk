@@ -1,4 +1,4 @@
-DIST ?= jessie
+DIST ?= stretch
 DIST_URL := http://http.debian.net/debian/
 
 IMAGE_MB ?= 2048
@@ -19,7 +19,7 @@ ifeq ($(findstring $(ODROID),c1 c2),)
 endif
 
 ifeq ($(DIST),stable)
-    $(warning You should not specify stable for DIST.  Supported distributions: jessie, wheezy)
+    $(warning You should not specify stable for DIST.  Supported distributions: stretch, jessie, wheezy)
 endif
 
 ifeq ($(ROOT_RW),)
