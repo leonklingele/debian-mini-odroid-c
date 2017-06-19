@@ -33,7 +33,7 @@ sudo apt-get install libc6:i386 libncurses5:i386 libstdc++6:i386 lib32z1
 ## Build the image (without Docker):
 Just use the make utility to build e.g. an sdcard-c2-stretch.img.  Be sure to run this with sudo, as root privileges are required to mount the image.
 ```
-sudo make ODROID=c2 DIST=stretch ROOT_RW=no IMAGE_MB=2024 SSH_PUBLIC_KEY_FILE="$HOME/.ssh/id_rsa.pub"
+sudo make ODROID=c2 DIST=stretch ROOT_RW=yes IMAGE_MB=2024 SSH_PUBLIC_KEY_FILE="$HOME/.ssh/id_rsa.pub"
 ```
 
 This will install the toolchains, compile u-boot, the kernel, bootstrap Debian and create a 1024mb sdcard-c1-stretch.img file, which then can be transferred to a sd card (e.g. using dd):
@@ -47,7 +47,7 @@ sudo dd bs=1M if=sdcard-c2-stretch.img of=/dev/YOUR_SD_CARD && sync
 docker build -t build-debian-odroid-image .
 
 # Then build the image
-./docker/build "c2" "stretch" "no"
+./docker/build "c2" "stretch" "yes"
 ```
 
 ## Customize your image:
