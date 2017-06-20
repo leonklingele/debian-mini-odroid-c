@@ -1,16 +1,26 @@
-DIST ?= jessie
+DIST ?= stretch
 DIST_URL := http://http.debian.net/debian/
 
 IMAGE_MB ?= 2048
 BOOT_MB ?= 128
 ROOT_MB=$(shell expr $(IMAGE_MB) - $(BOOT_MB))
 
+ifneq ($(SSH_PUBLIC_KEY_FILE),)
+    SSH_PUBLIC_KEY=$(shell cat "$(SSH_PUBLIC_KEY_FILE)")
+    ifeq ($(SSH_PUBLIC_KEY),)
+        $(warning SSH Public Key $(SSH_PUBLIC_KEY_FILE) not found, using RAW value)
+        SSH_PUBLIC_KEY=$(SSH_PUBLIC_KEY_FILE)
+    endif
+else
+    $(warning Not using a SSH Public Key)
+endif
+
 ifeq ($(findstring $(ODROID),c1 c2),)
     $(error No ODROID specified! Supported targets: c1, c2)
 endif
 
 ifeq ($(DIST),stable)
-    $(warning You should not specify stable for DIST.  Supported distributions: jessie, wheezy)
+    $(warning You should not specify stable for DIST.  Supported distributions: stretch, jessie, wheezy)
 endif
 
 ifeq ($(ROOT_RW),)
@@ -19,7 +29,7 @@ else
     ifeq ($(findstring $(ROOT_RW),yes no),)
         $(error ROOT_RW must be one of the following: yes, no)
     endif
-    
+
     ifeq ($(ROOT_RW),yes)
         ROOT_RW_FLAG := rw
     else
@@ -40,16 +50,16 @@ LINUX_TC_DIR := linux_$(ODROID)_tc
 ifeq ($(ODROID),c1)
     DIST_ARCH := armhf
 
-    UBOOT_TOOLCHAIN := gcc-linaro-arm-none-eabi-4.8-2014.04_linux.tar.xz
-    UBOOT_TOOLCHAIN_URL := https://releases.linaro.org/14.04/components/toolchain/binaries/$(UBOOT_TOOLCHAIN)
-    UBOOT_TC_PATH := $(UBOOT_TC_DIR)/gcc-linaro-arm-none-eabi-4.8-2014.04_linux/bin
+    UBOOT_TOOLCHAIN := gcc-linaro-4.9-2014.11-x86_64_aarch64-elf.tar.xz
+    UBOOT_TOOLCHAIN_URL := https://releases.linaro.org/archive/14.11/components/toolchain/binaries/aarch64-none-elf/$(UBOOT_TOOLCHAIN)
+    UBOOT_TC_PATH := $(UBOOT_TC_DIR)/gcc-linaro-4.9-2014.11-x86_64_aarch64-elf/bin
     UBOOT_TC_PREFIX := arm-linux-gnueabihf-
     UBOOT_BRANCH := odroidc-v2011.03
     UBOOT_CONFIG := odroidc_config
     UBOOT_ARCH := arm
 
-    LINUX_TOOLCHAIN := gcc-linaro-arm-linux-gnueabihf-4.9-2014.09_linux.tar.xz
-    LINUX_TOOLCHAIN_URL := https://releases.linaro.org/14.09/components/toolchain/binaries/$(LINUX_TOOLCHAIN)
+    LINUX_TOOLCHAIN := gcc-linaro-4.9-2014.11-x86_64_aarch64-linux-gnu.tar.xz
+    LINUX_TOOLCHAIN_URL := https://releases.linaro.org/archive/14.11/components/toolchain/binaries/aarch64-linux-gnu/$(LINUX_TOOLCHAIN)
     LINUX_TC_PATH := $(LINUX_TC_DIR)/bin
     LINUX_TC_PREFIX := arm-linux-gnueabihf-
     LINUX_BRANCH := odroidc-3.10.y
@@ -74,16 +84,16 @@ ifeq ($(ODROID),c2)
 
     DIST_ARCH := arm64
 
-    UBOOT_TOOLCHAIN := gcc-linaro-aarch64-none-elf-4.9-2014.09_linux.tar.xz
-    UBOOT_TOOLCHAIN_URL := https://releases.linaro.org/14.09/components/toolchain/binaries/$(UBOOT_TOOLCHAIN)
-    UBOOT_TC_PATH := $(UBOOT_TC_DIR)/gcc-linaro-aarch64-none-elf-4.9-2014.09_linux/bin
+    UBOOT_TOOLCHAIN := gcc-linaro-4.9-2014.11-x86_64_aarch64-elf.tar.xz
+    UBOOT_TOOLCHAIN_URL := https://releases.linaro.org/archive/14.11/components/toolchain/binaries/aarch64-none-elf/$(UBOOT_TOOLCHAIN)
+    UBOOT_TC_PATH := $(UBOOT_TC_DIR)/gcc-linaro-4.9-2014.11-x86_64_aarch64-elf/bin
     UBOOT_TC_PREFIX := aarch64-none-elf-
     UBOOT_BRANCH := odroidc2-v2015.01
     UBOOT_CONFIG := odroidc2_config
     UBOOT_ARCH := arm
 
-    LINUX_TOOLCHAIN := gcc-linaro-aarch64-linux-gnu-4.9-2014.09_linux.tar.xz
-    LINUX_TOOLCHAIN_URL := https://releases.linaro.org/14.09/components/toolchain/binaries/$(LINUX_TOOLCHAIN)
+    LINUX_TOOLCHAIN := gcc-linaro-4.9-2014.11-x86_64_aarch64-linux-gnu.tar.xz
+    LINUX_TOOLCHAIN_URL := https://releases.linaro.org/archive/14.11/components/toolchain/binaries/aarch64-linux-gnu/$(LINUX_TOOLCHAIN)
     LINUX_TC_PATH := $(LINUX_TC_DIR)/bin
     LINUX_TC_PREFIX := aarch64-linux-gnu-
     LINUX_BRANCH := odroidc2-3.14.y

@@ -19,15 +19,17 @@ delete-rootfs:
 	if mountpoint -q $(ROOTFS_DIR)/sys ; then umount $(ROOTFS_DIR)/sys ; fi
 	if mountpoint -q $(ROOTFS_DIR)/dev ; then umount $(ROOTFS_DIR)/dev ; fi
 	rm -rf $(wildcard $(ROOTFS_DIR) uInitrd)
-	
+
 .PHONY: build
 build: $(IMAGE_FILE)
 
 $(ROOTFS_DIR).base:
 	if test -d "$@.tmp"; then rm -rf "$@.tmp" ; fi
 	mkdir -p $@.tmp
-	debootstrap --foreign --no-check-gpg --include=ca-certificates,ssh,vim,locales,ntpdate,usbmount,initramfs-tools --arch=$(DIST_ARCH) $(DIST) $@.tmp $(DIST_URL)
+	debootstrap --foreign --include=ca-certificates,sudo,parted,rng-tools,ssh,vim,locales,ntpdate,initramfs-tools,insserv --arch=$(DIST_ARCH) $(DIST) $@.tmp $(DIST_URL)
 	cp `which $(QEMU_STATIC_BIN)` $@.tmp/usr/bin
+	update-binfmts --enable qemu-arm # C1
+	update-binfmts --enable qemu-aarch64 # C2
 	chroot $@.tmp /bin/bash -c "/debootstrap/debootstrap --second-stage"
 	rm $@.tmp/etc/hostname
 	rm $@.tmp/etc/ssh/ssh_host_*
@@ -46,7 +48,7 @@ $(ROOTFS_DIR): $(ROOTFS_DIR).base
 	mount -o bind /dev $@/dev
 	cp postinstall $@
 	if [ -d "postinst" ]; then cp -r postinst $@ ; fi
-	LINUX_VERSION="$(shell cat $(LINUX_SRC)/include/config/kernel.release)" && chroot $@ /bin/bash -c "/postinstall $(DIST) $(DIST_URL) $$LINUX_VERSION $(ODROID) $(ROOT_RW_FLAG)"
+	LINUX_VERSION="$(shell cat $(LINUX_SRC)/include/config/kernel.release)" && chroot $@ /bin/bash -c "/postinstall $(DIST) $(DIST_URL) $$LINUX_VERSION $(ODROID) $(ROOT_RW_FLAG) '$(SSH_PUBLIC_KEY)'"
 	if ls patches/*.patch 1> /dev/null 2>&1; then for i in patches/*.patch ; do patch -p0 -d $@ < $$i ; done fi
 	if [ -d patches/$(DIST) ]; then if ls patches/$(DIST)/*.patch 1> /dev/null 2>&1; then for i in patches/$(DIST)/*.patch; do patch -p0 -d $@ < $$i ; done fi fi
 	umount $@/proc

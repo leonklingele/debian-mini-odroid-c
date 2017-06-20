@@ -6,8 +6,8 @@
 
 set -e
 
-if [ "$#" -ne 5 ]; then
-	echo "Usage: $0 DIST DIST_URL KERNEL_VERSION ODROID ROOT_RW"
+if [ "$#" -ne 6 ]; then
+	echo "Usage: $0 DIST DIST_URL KERNEL_VERSION ODROID ROOT_RW SSH_PUBLIC_KEY"
 	exit 1
 fi
 
@@ -16,6 +16,7 @@ DIST_URL=$2
 KERNEL_VERSION=$3
 ODROID=$4
 ROOT_RW=$5
+SSH_PUBLIC_KEY="$6"
 
 echo "Running postinstall script..."
 
@@ -26,21 +27,34 @@ echo "root:odroid" | chpasswd
 sed -i "s/^#[[:space:]]*en_US\.UTF-8\(.*\)/en_US\.UTF-8\1/g" /etc/locale.gen
 locale-gen
 
+# Make dpkg/apt-get noninteractive
+export DEBIAN_FRONTEND=noninteractive
+
 # Set timezone
 dpkg-reconfigure -f noninteractive tzdata
 
 # Initialize /etc/apt/sources.list
-echo "deb $DIST_URL $DIST main contrib non-free" > /etc/apt/sources.list
-echo "deb-src $DIST_URL $DIST main contrib non-free" >> /etc/apt/sources.list
+cat > /etc/apt/sources.list <<EOF
+deb http://ftp.debian.org/debian/ $DIST main
+deb-src http://ftp.debian.org/debian/ $DIST main
+
+deb http://ftp.debian.org/debian/ $DIST-updates main
+deb-src http://ftp.debian.org/debian/ $DIST-updates main
+
+deb http://security.debian.org/ $DIST/updates main
+deb-src http://security.debian.org/ $DIST/updates main
+
+deb http://ftp.debian.org/debian/ $DIST-backports main
+deb-src http://ftp.debian.org/debian/ $DIST-backports main
+EOF
 
 # Update apt
-apt-get update
+apt-get -y update
+apt-get -y dist-upgrade
 
 # Generate the initial ramfs
 update-initramfs -c -t -k $KERNEL_VERSION
 
-insserv usbmount-start
-insserv framebuffer-start
 insserv hostname-init
 insserv sshd-init
 
@@ -52,17 +66,19 @@ chmod +x /usr/sbin/policy-rc.d
 
 # Run custom install scripts
 if [ -d /postinst ]; then
-	find /postinst -maxdepth 1 -type f -executable -not -name "*~" -exec {} "$DIST" "$ODROID" "$ROOT_RW" \;
+	find /postinst -maxdepth 1 -type f -executable -not -name "*~" -exec {} "$DIST" "$ODROID" "$ROOT_RW" "$SSH_PUBLIC_KEY" \;
 fi
 
 # Run custom install scripts for a specific distribution
 if [ -d /postinst/$DIST ]; then
-	find /postinst/$DIST -maxdepth 1 -type f -executable -not -name "*~" -exec {} "$DIST" "$ODROID" "$ROOT_RW" \;
+	find /postinst/$DIST -maxdepth 1 -type f -executable -not -name "*~" -exec {} "$DIST" "$ODROID" "$ROOT_RW" "$SSH_PUBLIC_KEY" \;
 fi
 
 # Re-enable services to start
 rm /usr/sbin/policy-rc.d
 
 # Cleanup
+apt-get autoclean
 apt-get clean
+dpkg --clear-avail
 rm -rf /var/log/*

@@ -1,0 +1,69 @@
+#!/usr/bin/env bash
+# The first argument is the name of the distribution
+# The second argument is the name of the odroid device, e.g. "c1" or "c2"
+# The third argument is whether the rootfs is mounted read-only: "rw" or "ro"
+# The fourth argument is the SSH Public Key
+
+set -e
+
+ssh_public_key="$4"
+
+cat > /etc/ssh/sshd_config <<'EOF'
+Port 22
+Protocol 2
+
+# HostKeys for protocol version 2
+HostKey /etc/ssh/ssh_host_rsa_key
+HostKey /etc/ssh/ssh_host_ed25519_key
+
+# Privilege Separation is turned on for security
+UsePrivilegeSeparation yes
+
+# Lifetime and size of ephemeral version 1 server key
+KeyRegenerationInterval 1h
+ServerKeyBits 4096
+
+# Logging
+SyslogFacility AUTH
+LogLevel INFO
+
+# Authentication:
+LoginGraceTime 120
+PermitRootLogin without-password
+StrictModes yes
+
+RSAAuthentication yes
+PubkeyAuthentication yes
+AuthorizedKeysFile %h/.ssh/authorized_keys
+
+# Don't read the user's ~/.rhosts and ~/.shosts files
+IgnoreRhosts yes
+# For this to work you will also need host keys in /etc/ssh_known_hosts
+RhostsRSAAuthentication no
+# Similar for protocol version 2
+HostbasedAuthentication no
+# Uncomment if you don't trust ~/.ssh/known_hosts for RhostsRSAAuthentication
+#IgnoreUserKnownHosts yes
+
+# To enable empty passwords, change to yes (NOT RECOMMENDED)
+PermitEmptyPasswords no
+PasswordAuthentication no
+UseDNS no
+UsePAM no
+ChallengeResponseAuthentication no
+X11Forwarding no
+
+# Allow client to pass locale environment variables
+AcceptEnv LANG LC_*
+
+# Ciphers and keying
+#RekeyLimit default none
+KexAlgorithms curve25519-sha256@libssh.org,diffie-hellman-group-exchange-sha256
+Ciphers chacha20-poly1305@openssh.com,aes256-gcm@openssh.com
+#,aes128-gcm@openssh.com,aes256-ctr
+MACs hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com
+#,umac-128-etm@openssh.com,hmac-sha2-512,hmac-sha2-256,umac-128@openssh.com
+EOF
+
+mkdir -p "/root/.ssh"
+echo "$ssh_public_key" > "/root/.ssh/authorized_keys"

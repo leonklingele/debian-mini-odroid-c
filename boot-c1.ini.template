@@ -3,31 +3,78 @@ ODROIDC-UBOOT-CONFIG
 # Possible screen resolutions
 # Uncomment only a single Line! The line with setenv written.
 # At least one mode must be selected.
- 
+
 # setenv m "vga"          # VGA 640x480
-# setenv m "480p"         # 480p 720x480
+setenv m "480p"         # 480p 720x480
 # setenv m "576p"         # 576p 720x576
 # setenv m "800x480p60hz" # WVGA 800x480
 # setenv m "720p"         # 720p 1280x720
 # setenv m "800p"         # 800p(WXGA) 1280x800
 # setenv m "sxga"         # SXGA 1280x1024
-setenv m "1080p"        # 1080P 1920x1080
+# setenv m "1080p"        # 1080P 1920x1080
 # setenv m "1920x1200"    # 1920x1200
- 
+
+# HDMI BPP Mode
+# setenv m_bpp "32"
+setenv m_bpp "16"
+
 # HDMI/DVI Mode Configuration
 setenv vout_mode "hdmi"
 # setenv vout_mode "dvi"
- 
-# HDMI BPP Mode
-setenv m_bpp "32"
-# setenv m_bpp "16"
- 
+
+# HDMI HotPlug Detection control
+# Allows you to force HDMI thinking that the cable is connected.
+# true = HDMI will believe that cable is always connected
+# false = will let board/monitor negotiate the connection status
+setenv hpd "true"
+#setenv hpd "false"
+
+# CEC Enable/Disable
+# 1 = Enables HDMI CEC
+# 0 = Disables HDMI CEC
+#setenv cec "0"
+
+# Disable VPU (video decoding engine, saves RAM)
+# 0 = disabled
+# 1 = enabled
+setenv vpu "0"
+
+# Server Mode (aka. No Graphics)
+# Setting nographics to 1 will disable all video subsystem
+# This mode is ideal of server type usage. (Saves ~300Mb of RAM)
+setenv nographics "1"
+
+# Disable HDMI Output (again, saves RAM!)
+# 0 = disabled
+# 1 = enabled
+setenv hdmioutput "0"
+
 # UHS Card Configuration
 # Uncomment the line below to __DISABLE__ UHS-1 MicroSD support
-# This might break boot for some brand/models of cards.
+# This might break boot for some brand models of cards.
 setenv disableuhs "disableuhs"
 
-setenv bootargs "console=ttyS0,115200n8 console=tty0 root=${ROOT_DEV} rootwait ${ROOT_RW} no_console_suspend vdaccfg=0xa000 logo=osd1,loaded,0x7900000,720p,full dmfc=3 cvbsmode=576cvbs hdmimode=${m} m_bpp=${m_bpp} vout=${vout_mode} ${disableuhs}"
-setenv bootcmd "fatload mmc 0:1 0x21000000 uImage; fatload mmc 0:1 0x22000000 uInitrd; fatload mmc 0:1 0x21800000 meson8b_odroidc.dtb; bootm 0x21000000 0x22000000 0x21800000"
-run bootcmd
+# Default Console Device Setting
+setenv condev "console=ttyS0,115200n8 console=tty0"   # on both
 
+###########################################
+
+# Boot Arguments
+setenv bootargs "root=${ROOT_DEV} rootwait ${ROOT_RW} ${condev} no_console_suspend fsck.repair=yes net.ifnames=0 elevator=noop vdaccfg=0xa000 logo=osd1,loaded,0x7900000,720p,full dmfc=3 cvbsmode=576cvbs hdmimode=${m} m_bpp=${m_bpp} vout=${vout} disablehpd=${hpd} ${disableuhs}"
+
+# Booting
+
+setenv loadaddr "0x22000000"
+setenv dtb_loadaddr "0x21800000"
+setenv initrd_loadaddr "0x21000000"
+
+fdt addr ${dtb_loadaddr}
+if test "${vpu}" = "0"; then fdt rm /mesonstream; fdt rm /vdec; fdt rm /ppmgr; fi
+if test "${nographics}" = "1"; then fdt rm /reserved-memory; fdt rm /aocec; fdt rm /mali@d00c0000; fi
+if test "${hdmioutput}" = "0"; then fdt rm /mesonfb; fi
+
+fatload mmc 0:1 ${initrd_loadaddr} uImage
+fatload mmc 0:1 ${loadaddr} uInitrd
+fatload mmc 0:1 ${dtb_loadaddr} meson8b_odroidc.dtb
+
+bootm ${initrd_loadaddr} ${loadaddr} ${dtb_loadaddr}
